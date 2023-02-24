@@ -5,11 +5,13 @@ const STATUS_ERROR = 1;
 const MINIMUM_REQUIRED_PERCENTAGE = 75;
 const COVERAGE_REPORT_FILE_PATH = './coverage/coverage-report.json';
 const COVERAGE_SUMMARY_FILE_PATH = './coverage/coverage-summary.xml';
+
 function printStatus(string $msg, int $exitCode = STATUS_OK): void
 {
     echo $msg . PHP_EOL;
     exit($exitCode);
 }
+
 /**
  * @param string $file
  * @return bool
@@ -19,6 +21,7 @@ function isXmlFile(string $file): bool
     $ext = pathinfo($file, PATHINFO_EXTENSION);
     return $ext === 'xml';
 }
+
 function calculateCoverageDifference(float $oldCoverage, float $newCoverage): string
 {
     if ($newCoverage >= $oldCoverage) {
@@ -26,6 +29,7 @@ function calculateCoverageDifference(float $oldCoverage, float $newCoverage): st
     }
     return number_format(($newCoverage * 2) - $oldCoverage, 2);
 }
+
 /**
  * @param $xmlFile
  * @return array
@@ -54,19 +58,24 @@ function calculate($xmlFile): array
         'Lines' => number_format($lineCoverage, 2)
     ];
 }
+
 if (!file_exists(COVERAGE_REPORT_FILE_PATH)) {
     printStatus("Coverage report not found", STATUS_ERROR);
 }
+
 $inputFile = COVERAGE_SUMMARY_FILE_PATH;
 $lastCoverageReport = file_get_contents(COVERAGE_REPORT_FILE_PATH);
 $lastCoverageReport = json_decode($lastCoverageReport, true)['lastCoverageReport'];
+
 if (!file_exists($inputFile)) {
     printStatus("Invalid input file '$inputFile' provided. The file was not found.", STATUS_ERROR);
 }
 if (!isXmlFile($inputFile)) {
     printStatus("Invalid input file '$inputFile' provided. The file must be in XML format.", STATUS_ERROR);
 }
+
 $xml = simplexml_load_file($inputFile);
+
 try {
     $currentCoverage = calculate($xml);
 } catch (Exception $e) {
